@@ -1,13 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+
+    [Header("----Ball Settings")]
     public GameObject[] balls;
     public GameObject FirePoint;
-    public float ballForce;
+    [SerializeField] private float  ballForce;
     int activeBallIndex;
+
+    [Header("----Level Settings")]
+    [SerializeField] private int targetBallCount;
+    [SerializeField] private int availableBallCount;
+    int enterBallCount;
+    public Slider levelSlider;
+    public TextMeshProUGUI remainBallCount_text;
+
 
     void Start()
     {
@@ -24,7 +36,7 @@ public class GameManager : MonoBehaviour
             balls[activeBallIndex].GetComponent<Rigidbody>().AddForce(balls[activeBallIndex].transform.TransformDirection(90, 90, 0)
              * ballForce, ForceMode.Force);
 
-            
+
             if (balls.Length - 1 == activeBallIndex)
             {
                 activeBallIndex = 0;
