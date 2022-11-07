@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+
         activeBallVoiceIndex = 0;
         activeBallIndex = 0;
         basketStartValue = 0.5f; // tiling buna göre ayarlı diye
@@ -76,6 +77,7 @@ public class GameManager : MonoBehaviour
 
         if (enterBallCount == targetBallCount)
         {
+            Time.timeScale = 0;
             otherAudio[0].Play();
             PlayerPrefs.SetInt("Level", SceneManager.GetActiveScene().buildIndex + 1);
             PlayerPrefs.SetInt("Star", PlayerPrefs.GetInt("Star") + 15); // bölüm sonu verilen yıldız sayısı
@@ -83,62 +85,96 @@ public class GameManager : MonoBehaviour
             winLevelNumber.text = "Level" + SceneManager.GetActiveScene().name; // level bla bla yazdırmak için
             panels[1].SetActive(true);
         }
-        if (availableBallCount == 0 && enterBallCount != targetBallCount)
+        int number = 0;
+        foreach (var item in balls)
         {
-            otherAudio[1].Play();
-            loseLevelNumber.text = "Level" + SceneManager.GetActiveScene().name;
-            panels[2].SetActive(true);
+            if (item.activeInHierarchy)
+            {
+                number++;
+            }
         }
-        if ((availableBallCount + enterBallCount) < targetBallCount)
+
+        if (number == 0)
         {
-            otherAudio[1].Play();
-            loseLevelNumber.text = "Level" + SceneManager.GetActiveScene().name;
-            panels[2].SetActive(true);
+            if (availableBallCount == 0 && enterBallCount != targetBallCount)
+            {
+                Time.timeScale = 0;
+                otherAudio[1].Play();
+                loseLevelNumber.text = "Level" + SceneManager.GetActiveScene().name;
+                panels[2].SetActive(true);
+            }
+            if ((availableBallCount + enterBallCount) < targetBallCount)
+            {
+                Time.timeScale = 0;
+                otherAudio[1].Play();
+                loseLevelNumber.text = "Level" + SceneManager.GetActiveScene().name;
+                panels[2].SetActive(true);
+            }
         }
+
+
 
     }
     public void OutsideBall()
     {
+        int number = 0;
+        foreach (var item in balls)
+        {
+            if (item.activeInHierarchy)
+            {
+                number++;
+            }
+        }
+
+        if (number == 0)
+        {
+            if (availableBallCount == 0)
+            {
+                Time.timeScale = 0;
+                otherAudio[1].Play();
+                loseLevelNumber.text = "Level" + SceneManager.GetActiveScene().name;
+                panels[2].SetActive(true);
+            }
+            if ((availableBallCount + enterBallCount) < targetBallCount)
+            {
+                Time.timeScale = 0;
+                otherAudio[1].Play();
+                loseLevelNumber.text = "Level" + SceneManager.GetActiveScene().name;
+                panels[2].SetActive(true);
+            }
+        }
 
 
-        if (availableBallCount == 0)
-        {
-            otherAudio[1].Play();
-            loseLevelNumber.text = "Level" + SceneManager.GetActiveScene().name;
-            panels[2].SetActive(true);
-        }
-        if ((availableBallCount + enterBallCount) < targetBallCount)
-        {
-            otherAudio[1].Play();
-            loseLevelNumber.text = "Level" + SceneManager.GetActiveScene().name;
-            panels[2].SetActive(true);
-        }
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Time.timeScale != 0)
         {
-            availableBallCount--;
-            remainBallCount_text.text = availableBallCount.ToString();
-            ballShoot.Play("BallShoot");
-            ballShootEffect.Play();
-            otherAudio[2].Play();
-            balls[activeBallIndex].transform.SetPositionAndRotation(FirePoint.transform.position, FirePoint.transform.rotation);
-            balls[activeBallIndex].SetActive(true);
-            balls[activeBallIndex].GetComponent<Rigidbody>().AddForce(balls[activeBallIndex].transform.TransformDirection(90, 90, 0)
-             * ballForce, ForceMode.Force);
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                availableBallCount--;
+                remainBallCount_text.text = availableBallCount.ToString();
+                ballShoot.Play("BallShoot");
+                ballShootEffect.Play();
+                otherAudio[2].Play();
+                balls[activeBallIndex].transform.SetPositionAndRotation(FirePoint.transform.position, FirePoint.transform.rotation);
+                balls[activeBallIndex].SetActive(true);
+                balls[activeBallIndex].GetComponent<Rigidbody>().AddForce(balls[activeBallIndex].transform.TransformDirection(90, 90, 0)
+                 * ballForce, ForceMode.Force);
 
 
-            if (balls.Length - 1 == activeBallIndex)
-            {
-                activeBallIndex = 0;
-            }
-            else
-            {
-                activeBallIndex++;
+                if (balls.Length - 1 == activeBallIndex)
+                {
+                    activeBallIndex = 0;
+                }
+                else
+                {
+                    activeBallIndex++;
+                }
             }
         }
 
+       // Mathf.Clamp(remainBallCount, 0f, 100f);
     }
 
     public void GameStop()
